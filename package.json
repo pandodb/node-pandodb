@@ -1,0 +1,27 @@
+{
+  "name": "node-pandodb",
+  "version": "1.0.0",
+  "description": "Node implementation of Pandodb",
+  "main": "index.js",
+  "scripts": {
+    "test": "None yet"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pandodb/node-pandodb.git"
+  },
+  "keywords": [
+    "pando"
+  ],
+  "author": "Sid Harder",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pandodb/node-pandodb/issues"
+  },
+  "homepage": "https://github.com/pandodb/node-pandodb#readme",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "ipfs-api": "^9.0.0"
+  }
+}
