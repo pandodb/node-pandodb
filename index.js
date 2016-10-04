@@ -1,32 +1,55 @@
-var express = require("express");
-var bodyParser = require("body-parser");
-
-var app = express();
-app.use(bodyParser.urlencoded({extended : true}));
-
-var ipfsAPI = require('ipfs-api');
-var ipfs = ipfsAPI('10.1.1.54', '5001', {protocol: 'http'});
 var Readable = require('stream').Readable;
+var rpc = require('json-rpc2');
+var ipfsAPI = require('ipfs-api');
+var ipfs = ipfsAPI('localhost', '5001', {protocol: 'http'});
 
-app.post('/ipfs/add', function(request, response){
-    console.log(request.body);
-    response.send(request.body);
-    //IPFSAdd();
+var gethRPCClient = rpc.Client.$create(8545, 'localhost');
+
+var server = rpc.Server.$create({
+    'websocket': true, 
+    'headers': { 
+        'Access-Control-Allow-Origin': '*'
+    }
 });
 
-app.listen(3000, function () {
-    console.log('Listening on port 3000');
-});
 
-function IPFSAdd() {
-    var readableStream = new Readable();
-    readableStream.push("The cow jumped over the moon.");
-    readableStream.push(null);
+function add(args, opt, callback) {
+    var stream = new Readable();
+    stream.push(JSON.stringify(args["data"]));
+    stream.push(null);
     
-    ipfs.util.addFromStream(readableStream, (err, result) => {
+    ipfs.util.addFromStream(stream, (err, result) => {
         if (err) {
-            throw err
+            throw err;
         }
-        console.log(result)
+    	callback(null, result);
     })    
 }
+
+function cat(args, opt, callback) {
+    ipfs.files.cat(args["hash"], function(err, result) {
+        if (err) {
+            throw err;
+        }
+
+	var jsonData = '';
+	result.on('data', chunk => jsonData += chunk);
+	result.on('end', () =>  {
+      	    callback(null, jsonData);
+        });	
+    });
+}
+
+function eth_accounts(args, opt, callback) {
+  gethRPCClient.call('eth_accounts', null, function(err, result) {
+    callback(null, result);
+  });
+}
+
+server.expose('add', add);
+server.expose('cat', cat);
+server.expose('eth_accounts', eth_accounts );
+
+server.listen(8000, '10.1.2.27', function() {
+    console.log("Listening on port 8000");
+});
