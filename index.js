@@ -1,9 +1,9 @@
-var Readable = require('stream').Readable;
 var rpc = require('json-rpc2');
 var ipfsAPI = require('ipfs-api');
 var ipfs = ipfsAPI('localhost', '5001', {protocol: 'http'});
 
 var gethRPCClient = rpc.Client.$create(8545, 'localhost');
+var eth = require("./contract.js");
 
 var server = rpc.Server.$create({
     'websocket': true, 
@@ -11,7 +11,6 @@ var server = rpc.Server.$create({
         'Access-Control-Allow-Origin': '*'
     }
 });
-
 
 function add(args, opt, callback) {
     var stream = new Readable();
@@ -22,7 +21,7 @@ function add(args, opt, callback) {
         if (err) {
             throw err;
         }
-    	callback(null, result);
+	callback(null, result);
     })    
 }
 
@@ -46,6 +45,22 @@ function eth_accounts(args, opt, callback) {
   });
 }
 
+
+function getCoinbase(args, opt, callback) {
+  callback(null, eth.GetCoinbase());
+}
+
+function getCoinbaseBalance(args, opt, callback) {
+  callback(null, eth.GetCoinbaseBalance());
+}
+
+function submitContract(args, opt, callback) {
+  callback(null, eth.SubmitContract(args["DatabaseName"]));
+}
+
+server.expose('getCoinbase', getCoinbase);
+server.expose('getCoinbaseBalance', getCoinbaseBalance);
+server.expose('submitContract', submitContract);
 server.expose('add', add);
 server.expose('cat', cat);
 server.expose('eth_accounts', eth_accounts );
