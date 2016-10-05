@@ -39,23 +39,16 @@ function cat(args, opt, callback) {
     });
 }
 
-function eth_accounts(args, opt, callback) {
-  gethRPCClient.call('eth_accounts', null, function(err, result) {
-    callback(null, result);
-  });
-}
-
-
 function getCoinbase(args, opt, callback) {
-  callback(null, eth.GetCoinbase());
+  callback(null, eth.getCoinbase());
 }
 
 function getCoinbaseBalance(args, opt, callback) {
-  callback(null, eth.GetCoinbaseBalance());
+  callback(null, eth.getCoinbaseBalance());
 }
 
 function submitContract(args, opt, callback) {
-  callback(null, eth.SubmitContract(args["DatabaseName"]));
+  callback(null, eth.submitContract(args["DatabaseName"]));
 }
 
 server.expose('getCoinbase', getCoinbase);
@@ -63,7 +56,6 @@ server.expose('getCoinbaseBalance', getCoinbaseBalance);
 server.expose('submitContract', submitContract);
 server.expose('add', add);
 server.expose('cat', cat);
-server.expose('eth_accounts', eth_accounts );
 
 server.listen(8000, '10.1.2.27', function() {
     console.log("Listening on port 8000");
